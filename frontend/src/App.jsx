@@ -7,6 +7,8 @@ import ProgramList from "./components/Program/ProgramList";
 import ProgramForm from "./components/Program/ProgramForm";
 import ClientList from "./components/Client/ClientList";
 import ClientForm from "./components/Client/ClientForm";
+import ClientProfile from "./components/Client/ClientProfile";
+import EnrollProgram from "./components/Client/EnrollProgram";
 
 const App = () => {
   return (
@@ -22,6 +24,8 @@ const App = () => {
           <Route path="/clients" element={<ClientList />} />
           <Route path="/clients/create" element={<ClientForm />} />
           <Route path="/clients/edit/:id" element={<ClientForm />} />
+          <Route path="/clients/:id" element={<ClientProfile />} />
+          <Route path="/clients/:id/enroll" element={<EnrollProgram />} />
         </Routes>
       </AuthProvider>
     </Router>

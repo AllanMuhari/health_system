@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-const ProgramForm = ({ match }) => {
+const ProgramForm = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
+  const { id } = useParams(); // 👈 this gets the ID from the URL
 
   useEffect(() => {
-    if (match.params.id) {
+    if (id) {
       setIsEditing(true);
       const fetchProgram = async () => {
         try {
-          const response = await api.get(`/programs/${match.params.id}`);
+          const response = await api.get(`/programs/${id}`);
           setName(response.data.data.program.name);
           setDescription(response.data.data.program.description);
         } catch (error) {
@@ -22,13 +23,13 @@ const ProgramForm = ({ match }) => {
       };
       fetchProgram();
     }
-  }, [match.params.id]);
+  }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (isEditing) {
-        await api.put(`/programs/${match.params.id}`, { name, description });
+        await api.put(`/programs/${id}`, { name, description });
       } else {
         await api.post("/programs", { name, description });
       }
