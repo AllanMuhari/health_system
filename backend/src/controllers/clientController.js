@@ -124,33 +124,43 @@ export const updateClient = catchAsync(async (req, res, next) => {
 });
 
 export const enrollClient = catchAsync(async (req, res, next) => {
-  const { programId } = req.body;
+  const { programId, programIds } = req.body;
+  const clientId = req.params.id;
 
-  // Check if enrollment exists
-  const existingEnrollment = await prisma.programEnrollment.findFirst({
-    where: {
-      clientId: req.params.id,
-      programId,
-    },
-  });
+  // Handle both single programId or multiple programIds
+  const programsToEnroll = programIds || (programId ? [programId] : []);
 
-  if (existingEnrollment) {
-    return next(
-      new AppError("Client is already enrolled in this program", 400)
-    );
+  if (programsToEnroll.length === 0) {
+    return next(new AppError("No programs provided for enrollment", 400));
   }
 
-  // Create enrollment
-  await prisma.programEnrollment.create({
-    data: {
-      clientId: req.params.id,
-      programId,
-      status: "active",
-    },
+  // Process all enrollments
+  const enrollmentPromises = programsToEnroll.map(async (progId) => {
+    // Check if enrollment exists
+    const existingEnrollment = await prisma.programEnrollment.findFirst({
+      where: {
+        clientId,
+        programId: progId,
+      },
+    });
+
+    if (!existingEnrollment) {
+      // Create enrollment if it doesn't exist
+      return prisma.programEnrollment.create({
+        data: {
+          clientId,
+          programId: progId,
+          status: "active",
+        },
+      });
+    }
+    return null;
   });
 
+  await Promise.all(enrollmentPromises);
+
   const updatedClient = await prisma.client.findUnique({
-    where: { id: req.params.id },
+    where: { id: clientId },
     include: {
       programs: {
         include: {
@@ -193,13 +203,11 @@ export const getClientEnrollments = catchAsync(async (req, res, next) => {
 
 export const updateEnrollmentStatus = catchAsync(async (req, res, next) => {
   const { status } = req.body;
+  const { id, enrollmentId } = req.params;
 
   const updatedEnrollment = await prisma.programEnrollment.update({
     where: {
-      clientId_programId: {
-        clientId: req.params.clientId,
-        programId: req.params.programId,
-      },
+      id: enrollmentId,
     },
     data: { status },
     include: {
