@@ -5,6 +5,8 @@ import {
   createClient,
   updateClient,
   enrollClient,
+  getClientEnrollments,
+  updateEnrollmentStatus,
 } from "../controllers/clientController.js";
 import { protect } from "../middlewares/auth.js";
 
@@ -17,5 +19,8 @@ router.route("/").get(getAllClients).post(createClient);
 router.route("/:id").get(getClient).patch(updateClient);
 
 router.post("/:id/enroll", enrollClient);
+router.get("/:id/enrollments", getClientEnrollments);
+router.patch("/:id/enrollments/:enrollmentId", updateEnrollmentStatus);
+
 
 export default router;

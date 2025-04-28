@@ -174,3 +174,43 @@ export const enrollClient = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+export const getClientEnrollments = catchAsync(async (req, res, next) => {
+  const enrollments = await prisma.programEnrollment.findMany({
+    where: { clientId: req.params.id },
+    include: {
+      program: true,
+    },
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      enrollments,
+    },
+  });
+});
+
+export const updateEnrollmentStatus = catchAsync(async (req, res, next) => {
+  const { status } = req.body;
+
+  const updatedEnrollment = await prisma.programEnrollment.update({
+    where: {
+      clientId_programId: {
+        clientId: req.params.clientId,
+        programId: req.params.programId,
+      },
+    },
+    data: { status },
+    include: {
+      program: true,
+    },
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      enrollment: updatedEnrollment,
+    },
+  });
+});
