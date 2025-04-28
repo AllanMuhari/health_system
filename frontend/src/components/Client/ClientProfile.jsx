@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../../services/api";
 
 const ClientProfile = () => {
@@ -11,9 +11,9 @@ const ClientProfile = () => {
   useEffect(() => {
     const fetchClientProfile = async () => {
       try {
-        const response = await api.get(`/clients/${id}`); // Adjust your API if needed
+        const response = await api.get(`/clients/${id}`);
         setClient(response.data.data.client);
-        setPrograms(response.data.data.client.programs || []); // Assuming programs are included
+        setPrograms(response.data.data.client.programs || []);
       } catch (error) {
         console.error("Error fetching client profile:", error);
       }
@@ -29,6 +29,11 @@ const ClientProfile = () => {
       </div>
     );
   }
+
+  // Format date of birth for display if it exists
+  const formattedDateOfBirth = client.dateOfBirth
+    ? new Date(client.dateOfBirth).toLocaleDateString()
+    : "Not provided";
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -47,6 +52,19 @@ const ClientProfile = () => {
           <p>
             <strong>Phone:</strong> {client.phone}
           </p>
+          <p>
+            <strong>Date of Birth:</strong> {formattedDateOfBirth}
+          </p>
+          {client.gender && (
+            <p>
+              <strong>Gender:</strong> {client.gender}
+            </p>
+          )}
+          {client.address && (
+            <p>
+              <strong>Address:</strong> {client.address}
+            </p>
+          )}
         </div>
 
         <div>
@@ -65,7 +83,12 @@ const ClientProfile = () => {
           )}
         </div>
 
-        <div className="mt-8 flex justify-end">
+        <div className="mt-8 flex justify-end space-x-4">
+          <Link
+            to={`/clients/${client.id}/edit`}
+            className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">
+            Edit Profile
+          </Link>
           <Link
             to={`/clients/${client.id}/enroll`}
             className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md">

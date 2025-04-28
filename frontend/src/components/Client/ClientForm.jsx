@@ -7,9 +7,12 @@ const ClientForm = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [gender, setGender] = useState("");
+  const [address, setAddress] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [programs, setPrograms] = useState([]); // All available programs
-  const [selectedPrograms, setSelectedPrograms] = useState([]); // Programs selected by user
+  const [programs, setPrograms] = useState([]);
+  const [selectedPrograms, setSelectedPrograms] = useState([]);
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -17,7 +20,7 @@ const ClientForm = () => {
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
-        const response = await api.get("/programs"); // assuming this returns programs
+        const response = await api.get("/programs");
         setPrograms(response.data.data.programs);
       } catch (error) {
         console.error("Error fetching programs:", error);
@@ -37,7 +40,17 @@ const ClientForm = () => {
           setLastName(client.lastName);
           setEmail(client.email);
           setPhone(client.phone);
-          setSelectedPrograms(client.programs.map((p) => p.id)); // assuming client has programs
+          setAddress(client.address || "");
+          setGender(client.gender || "");
+
+          // Handle date format for display
+          if (client.dateOfBirth) {
+            // Format the date for the date input (YYYY-MM-DD)
+            const date = new Date(client.dateOfBirth);
+            setDateOfBirth(date.toISOString().split("T")[0]);
+          }
+
+          setSelectedPrograms(client.programs.map((p) => p.id));
         } catch (error) {
           console.error("Error fetching client:", error);
         }
@@ -49,16 +62,23 @@ const ClientForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Format the date as ISO string if it exists
+      const formattedDate = dateOfBirth
+        ? new Date(dateOfBirth).toISOString()
+        : null;
+
       const payload = {
         firstName,
         lastName,
-        email,
+        dateOfBirth: formattedDate,
+        gender,
+        address,
         phone,
-        programIds: selectedPrograms, // Include selected programs
+        email,
       };
 
       if (isEditing) {
-        await api.put(`/clients/${id}`, payload);
+        await api.patch(`/clients/${id}`, payload);
       } else {
         await api.post("/clients", payload);
       }
@@ -140,6 +160,54 @@ const ClientForm = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              className="block text-sm font-medium text-gray-600 mb-2"
+              htmlFor="dateOfBirth">
+              Date of Birth
+            </label>
+            <input
+              type="date"
+              id="dateOfBirth"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label
+              className="block text-sm font-medium text-gray-600 mb-2"
+              htmlFor="gender">
+              Gender
+            </label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md">
+              <option value="">Select Gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label
+              className="block text-sm font-medium text-gray-600 mb-2"
+              htmlFor="address">
+              Address
+            </label>
+            <textarea
+              id="address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-md"
+              rows="3"
             />
           </div>
 
