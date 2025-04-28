@@ -84,11 +84,11 @@ const ClientProfile = () => {
         </div>
 
         <div className="mt-8 flex justify-end space-x-4">
-          <Link
+          {/* <Link
             to={`/clients/${client.id}/edit`}
             className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md">
             Edit Profile
-          </Link>
+          </Link> */}
           <Link
             to={`/clients/${client.id}/enroll`}
             className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-md">
