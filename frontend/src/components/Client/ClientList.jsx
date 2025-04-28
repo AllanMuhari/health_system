@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const ClientsList = () => {
   const [clients, setClients] = useState([]);
@@ -10,7 +10,7 @@ const ClientsList = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await api.get("/clients"); // Assuming your API endpoint
+        const response = await api.get("/clients"); // Fetch clients from the API
         setClients(response.data.data.clients);
       } catch (error) {
         console.error("Error fetching clients:", error);
@@ -37,12 +37,24 @@ const ClientsList = () => {
     navigate(`/clients/${id}`); // Navigate to client profile page
   };
 
+  const isActive = (path) => {
+    return location.pathname.startsWith(path);
+  };
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-700">
         Clients
       </h2>
-
+      <div className="text-center w-full m-4">
+        <Link
+          to="/clients/create"
+          className={`inline-block bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-md ${
+            isActive("/clients/create") ? "text-blue-400 underline" : ""
+          }`}>
+          Create Clients
+        </Link>
+      </div>
       <div className="mb-6">
         <input
           type="text"

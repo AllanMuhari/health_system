@@ -28,13 +28,6 @@ const Navigation = () => {
             }`}>
             Clients
           </Link>
-          <Link
-            to="/clients/create"
-            className={`hover:text-blue-300 ${
-              isActive("/clients/create") ? "text-blue-400 underline" : ""
-            }`}>
-            Create Clients
-          </Link>
         </div>
       </div>
     </nav>
